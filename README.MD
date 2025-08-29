@@ -1,22 +1,21 @@
 <h1>
     <img src="images/안녕-100.png" alt="파동이" width="60" height="60"> 파동이봇
 </h1>
+
+파동이봇은 한국원자력연구원 규정 및 연구원 정보에 관한 질문에 대해 자세하고 정확한 답변을 제공하는 서비스입니다.\
+보안의 이유로 본 REPOSITORY에는 일부 파일만 공개하고 있습니다.
 <br>
-<h2>1️⃣ 파동이봇</h2>
-파동이봇은 규정에 관한 질문에 대해 자세하고 정확한 답변을 제공하는 앱입니다.<br>
-이 앱은 Python으로 작성되었으며, GPT-3.5-turbo 기반의 OpenAI API와 Streamlit을 활용하여 구현되었습니다.<br>
-사용자로부터 입력된 질문을 바탕으로, 한국원자력연구원의 규정 문서에서 유사한 내용을 찾아 대답합니다.<br>
-보안의 이유로 본 REPOSITORY에는 일부 파일만 공개됩니다.<br>
-<br>
-<h3> 👇🏻 예시 </h3>
+
+## 💭 서비스 화면
+
 1) 초기화면<br>
-<img src="images/페이지1.JPG" alt="앱1" width="70%"><br>
+<img src="images/페이지1.JPG" alt="앱1" width="100%"><br>
 
 2) 질문 입력 및 답변 생성 과정<br>
-<img src="images/페이지2.JPG" alt="앱1" width="70%"><br>
+<img src="images/페이지2.JPG" alt="앱1" width="100%"><br>
 
 3) 답변 생성 및 참고 문서 제공<br>
-<img src="images/페이지3.JPG" alt="앱1" width="70%">
+<img src="images/페이지3.JPG" alt="앱1" width="100%">
 <br>
 <br>
 <h2>2️⃣ 주요 기능</h2>
@@ -25,26 +24,67 @@
 &nbsp; - 대화 기록을 관리하고, 사용자와 파동이봇 간의 소통을 시각화<br>
 <br>
 
-<h2>3️⃣ 앱 구성</h2>
+<h2>3️⃣ 서비스 구성</h2>
 &nbsp; - 질문 입력: 사용자로부터 규정에 관한 질문을 입력받음<br>
 &nbsp; - 답변 생성: 입력된 질문을 바탕으로, 한국원자력연구원의 규정 문서에서 유사한 내용을 찾아 답변 생성<br>
 &nbsp; - 대화 기록: 사용자와 파동이봇 간의 소통 내용을 시각화하고 관리<br>
 &nbsp; - 참고 문서: 답변에 참고한 문서를 사용자에게 제공.<br>
 <br>
 
-<h2>4️⃣ 개발 도구</h2>
+<h2>4️⃣ 파이프라인</h2>
 <div>
 <img alt="Python" src="https://img.shields.io/badge/Python-3776AB.svg?&style=for-the-badge&logo=Python&logoColor=white"/>
 <img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-FF4B4B.svg?&style=for-the-badge&logo=Streamlit&logoColor=white"/>
 <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-412991.svg?&style=for-the-badge&logo=OpenAI&logoColor=white"/>
 <img alt="Flask"
 src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white">
+<img alt="Docker"
+src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 <img alt="Google_Cloud"
 src="https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white"/><br><br>
 </div>
-<h2>5️⃣ 세미나 영상 </h2>
-<a href="https://www.youtube.com/live/NLI1REMI51s?feature=share">한국원자력연구원의 챗봇 파동이봇: 좌충우돌 개발 여정 (한국원자력연구원 김홍비 인턴연구원)</a>
 
+### 1. 문서 전처리 및 Retrieval 준비
+![step1](images/step1.png)
+
+- 🔎 For Hybrid Search
+  - BM25 검색을 위한 chunk 토큰화
+  ```
+  def tokenizer(sent):
+    sent = okt.morphs(sent, norm=False, stem=True)
+    return sent
+
+  embeddings = [tokenizer(doc) for doc in df.iloc[:,0]]
+  bm25 = BM25Okapi(embeddings)
+  ```
+  - Cosine Similarity 계산을 위한 chunk 임베딩
+  ```
+  embedding_model = "text-embedding-ada-002"
+  embeddings = df.iloc[:,0].apply([lambda x: get_embedding(x, engine=embedding_model)])
+  ```
+
+### 2. Retrieval & Generate Answer
+![step2](images/step2.png)
+
+### 3. Answer Verification
+![step3](images/step3.png)
+
+### 4. 평가
+> 📄 [[논문]](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11554935) 거대언어모델과 문서검색 알고리즘을 활용한 한국원자력연구원 규정 질의응답 시스템 개발
+
+검색 및 답변 평가 항목\
+✔ 규정 문서를 참고했나요?\
+✔ 공개된 문서(예: ALIO, 나무 위키)를 참고했나요?\
+✔ 부서에서 제공한 문서를 참고했나요?\
+✔ 표나 링크를 인식해서 답변했나요?\
+✔ 모델의 내부 지식으로 답변할 수 있는 질문에도 문서 정보를 기반으로 답변했나요?
+<img src="images/step4.png" alt="step4" width="40%">
+
+<h2>5️⃣ 세미나 영상 </h2>
+
+📹 [[Youtube]](https://www.youtube.com/live/NLI1REMI51s?feature=share) 한국원자력연구원의 챗봇 파동이봇: 좌충우돌 개발 여정 (한국원자력연구원 김홍비 인턴연구원)
+
+<!--
 <br>
 <h2>6️⃣ 업데이트</h2>
 <table>
@@ -118,7 +158,15 @@ src="https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=g
       </td>
   </tbody>
 </table>
-<br>
-<h2>7️⃣ 참고 자료</h2>
+<br> -->
+
+<!-- 
+```
+pip install -r requirements.txt
+
+os.environ["OPENAI_KEY"]
+``` -->
+
+<h2>6️⃣ 참고 자료</h2>
 &nbsp; - <a href="https://github.com/mukulpatnaik/researchgpt">Researchgpt</a>
 <p>&nbsp; - <a href="https://cloud.google.com/sdk/docs?hl=ko">Google Cloud</a></p>

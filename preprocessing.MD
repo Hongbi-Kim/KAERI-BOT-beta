@@ -10,7 +10,7 @@
   - 문서를 잘 추출하기 위한 사전 정리</p>
   <br>
 
-  <img src="images/전처리1.JPG" alt="앱1" width="80%"><br>
+  <img src="images/전처리.png" alt="앱1" width="80%"><br>
   <h2>1️⃣ 주요 함수 및 클래스</h2>
   <ul>
     <li>
@@ -40,7 +40,7 @@
     <img src="images/목차1.png" alt="문제1" width="80%"><br><br></ul>
     2) 띄어쓰기, 부호 등 제대로 안 되어 있음.<br>
     <ul><img src="images/문제3.png" alt="문제3" width="80%"><br><br></ul>
-    3) 문서 나누기<br>
+    3) 문서 나누기 (Chunking)<br>
     <li>PDF 문서 전체를 prompt에 입력하면, 토큰 개수 제한으로 오류 발생</li>
     <li>적절하게 문서를 나누는 것이 중요함</li>
     <br>
@@ -51,10 +51,23 @@
 <br><br>
 <h1>🔎검색 알고리즘을 활용한 문서 추출</h1>
 <h2>1️⃣ 코사인 유사도(Cosine Similarity)</h2>
-<ul><li> 내용 추가 예정</li></ul><br>
+
+```
+query_embedding = get_embedding(
+    query,
+    engine="text-embedding-ada-002"
+)
+df["similarity"] = df.embeddings.apply(lambda x: cosine_similarity(x, query_embedding))
+```
+
 <h2>2️⃣ BM25 (Best Match 25)</h2>
-<ul><li> 내용 추가 예정</li></ul><br>
+
+```
+def tokenizer(sent):
+    sent = okt.morphs(sent, norm=False, stem=True)
+    return sent
+tokenized_query = tokenizer(query)
+scores = bm25.get_scores(tokenized_query)
+```
+
 👉🏻 총 3개의 Paragraph 추출
-<br>
-<br>
-<h1>💬문서 기반의 답변 생성</h1>
